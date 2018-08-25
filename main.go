@@ -3,24 +3,30 @@ package main
 import (
 	"log"
 	"net/http"
+	"path/filepath"
+	"sync"
+	"text/template"
 )
 
-func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(`
-		<html>
-		  <head>
-		    <title>チャット</title>
-		  </head>
-		  <body>
-		    チャットしましょう！
-		  </body>
-		</html>
-		`))
+// templは１つのテンプレートを表す
+type templateHandler struct {
+	once     sync.Once
+	filename string
+	templ    *template.Template
+}
+
+// ServeHTTPはHTTPリクエストを処理する
+func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	t.once.Do(func() {
+		t.templ = template.Must(template.ParseFiles(filepath.Join("templates", t.filename)))
 	})
-	//Webサーバーを開始します
+	t.templ.Execute(w, r)
+}
+
+func main() {
+	http.Handle("/", &templateHandler{filename: "chat.html"})
+	// Webサーバーを開始
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatal("ListenAndServe:", err)
-
 	}
 }
