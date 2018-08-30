@@ -1,11 +1,14 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	"sync"
 	"text/template"
+	"trace"
 )
 
 // templは１つのテンプレートを表す
@@ -24,13 +27,17 @@ func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	var addr = flag.String("addr", ":8080", "アプリケーションアドレス")
+	flag.Parse() // フラグを解析
 	r := newRoom()
+	r.tracer = trace.New(os.Stdout)
 	http.Handle("/", &templateHandler{filename: "chat.html"})
 	http.Handle("/room", r)
 	// チャットルーム開始
 	go r.run()
-	// Webサーバーを開始
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	// Webサーバーを起動
+	log.Println("Webサーバーを起動します。ポート:", *addr)
+	if err := http.ListenAndServe(*addr, nil); err != nil {
 		log.Fatal("ListenAndServe:", err)
 	}
 }
