@@ -8,7 +8,8 @@ import (
 	"path/filepath"
 	"sync"
 	"text/template"
-	"trace"
+
+	"github.com/goki0524/gopackage/trace"
 )
 
 // templは１つのテンプレートを表す

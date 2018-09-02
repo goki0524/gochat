@@ -4,8 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"trace"
-
+	"github.com/goki0524/gopackage/trace"
 	"github.com/gorilla/websocket"
 )
 
