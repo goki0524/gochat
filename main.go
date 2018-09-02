@@ -10,6 +10,9 @@ import (
 	"text/template"
 
 	"github.com/goki0524/gopackage/trace"
+	"github.com/stretchr/gomniauth"
+	"github.com/stretchr/gomniauth/providers/google"
+	"github.com/stretchr/objx"
 )
 
 // templは１つのテンプレートを表す
@@ -24,12 +27,25 @@ func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	t.once.Do(func() {
 		t.templ = template.Must(template.ParseFiles(filepath.Join("templates", t.filename)))
 	})
-	t.templ.Execute(w, r)
+	data := map[string]interface{}{
+		"Host": r.Host,
+	}
+	if authCookie, err := r.Cookie("auth"); err == nil {
+		data["UserData"] = objx.MustFromBase64(authCookie.Value)
+	}
+	t.templ.Execute(w, data)
 }
 
 func main() {
 	var addr = flag.String("addr", ":8080", "アプリケーションアドレス")
 	flag.Parse() // フラグを解析
+	// Gomniauthのセットアップ
+	gomniauth.SetSecurityKey("55dfbg7iu2nb4uywevihjw4tuiyub34noilk")
+	gomniauth.WithProviders(
+		// TODO: facebookとgithubも追加する
+		// ("クライアントID", "秘密の値", "リダイレクト先")
+		google.New("42313837065-6h3dc1dfpthfa94bgln3i02oi1gumdfu.apps.googleusercontent.com", "A9XTv_XEUnExMjJnUct-Y_es", "http://localhost:8080/auth/callback/google"),
+	)
 	r := newRoom()
 	r.tracer = trace.New(os.Stdout)
 	// http.Handle("/", &templateHandler{filename: "chat.html"})
