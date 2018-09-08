@@ -46,7 +46,9 @@ func main() {
 		// ("クライアントID", "秘密の値", "リダイレクト先")
 		google.New("42313837065-6h3dc1dfpthfa94bgln3i02oi1gumdfu.apps.googleusercontent.com", "A9XTv_XEUnExMjJnUct-Y_es", "http://localhost:8080/auth/callback/google"),
 	)
-	r := newRoom()
+	// アバターを取得する方法は２つある。UseAuthAvatar or UseGravatar
+	// r := newRoom(UseAuthAvatar)
+	r := newRoom(UseGravatar)
 	r.tracer = trace.New(os.Stdout)
 	http.Handle("/chat", MustAuth(&templateHandler{filename: "chat.html"}))
 	http.Handle("/login", &templateHandler{filename: "login.html"})
