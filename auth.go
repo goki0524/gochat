@@ -12,6 +12,26 @@ import (
 	"github.com/stretchr/objx"
 )
 
+import gomniauthcommon "github.com/stretchr/gomniauth/common"
+
+// ChatUser Avatarの実装に必要な情報を保持
+type ChatUser interface {
+	UniqueID() string
+	AvatarURL() string
+}
+
+// chatUser chatUserは2つのインターフェースを満たしている
+// 1.型の埋め込みによってGomniauthのUserインターフェースを実装している
+// 2.UniqueID()のレシーバーであり、ChatUserのインターフェースを実装している
+type chatUser struct {
+	gomniauthcommon.User // 型の埋め込み(type embedding)
+	uniqueID             string
+}
+
+func (u chatUser) UniqueID() string {
+	return u.uniqueID
+}
+
 type authHandler struct {
 	next http.Handler
 }
@@ -34,6 +54,7 @@ func (h *authHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func MustAuth(handler http.Handler) http.Handler {
 	return &authHandler{next: handler}
 }
+
 func loginHandler(w http.ResponseWriter, r *http.Request) {
 	segs := strings.Split(r.URL.Path, "/")
 	action := segs[2]
@@ -66,15 +87,19 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Fatalln("ユーザーの取得に失敗しました", provider, "-", err)
 		}
+		chatUser := &chatUser{User: user}
 		m := md5.New()
-		io.WriteString(m, strings.ToLower(user.Email()))
-		userID := fmt.Sprintf("%x", m.Sum(nil))
+		io.WriteString(m, strings.ToLower(user.Name()))
+		chatUser.uniqueID = fmt.Sprintf("%x", m.Sum(nil))
+		avatarURL, err := avatars.GetAvatarURL(chatUser)
+		if err != nil {
+			log.Fatalln("GetAvatarURLに失敗しました", "-", err)
+		}
 		// データを保存
 		authCookieValue := objx.New(map[string]interface{}{
-			"userid":     userID,
+			"userid":     chatUser.uniqueID,
 			"name":       user.Name(),
-			"avatar_url": user.AvatarURL(),
-			"email":      user.Email(),
+			"avatar_url": avatarURL,
 		}).MustBase64()
 		http.SetCookie(w, &http.Cookie{
 			Name:  "auth",
@@ -82,6 +107,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 			Path:  "/"})
 		w.Header()["Location"] = []string{"/chat"}
 		w.WriteHeader(http.StatusTemporaryRedirect)
+
 	default:
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Fprintf(w, "アクション%sには非対応です", action)

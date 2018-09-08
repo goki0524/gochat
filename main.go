@@ -15,6 +15,12 @@ import (
 	"github.com/stretchr/objx"
 )
 
+var avatars Avatar = TryAvatars{
+	UseFileSystemAvatar,
+	UseAuthAvatar,
+	UseGravatar,
+}
+
 // templは１つのテンプレートを表す
 type templateHandler struct {
 	once     sync.Once
@@ -36,9 +42,12 @@ func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	t.templ.Execute(w, data)
 }
 
+var addr = flag.String("addr", ":8080", "アプリケーションアドレス")
+
 func main() {
-	var addr = flag.String("addr", ":8080", "アプリケーションアドレス")
+
 	flag.Parse() // フラグを解析
+
 	// Gomniauthのセットアップ
 	gomniauth.SetSecurityKey("55dfbg7iu2nb4uywevihjw4tuiyub34noilk")
 	gomniauth.WithProviders(
@@ -46,10 +55,10 @@ func main() {
 		// ("クライアントID", "秘密の値", "リダイレクト先")
 		google.New("42313837065-6h3dc1dfpthfa94bgln3i02oi1gumdfu.apps.googleusercontent.com", "A9XTv_XEUnExMjJnUct-Y_es", "http://localhost:8080/auth/callback/google"),
 	)
-	// アバターを取得する方法は２つある。UseAuthAvatar or UseGravatar
-	// r := newRoom(UseAuthAvatar)
-	r := newRoom(UseGravatar)
+
+	r := newRoom()
 	r.tracer = trace.New(os.Stdout)
+
 	http.Handle("/chat", MustAuth(&templateHandler{filename: "chat.html"}))
 	http.Handle("/login", &templateHandler{filename: "login.html"})
 	http.HandleFunc("/auth/", loginHandler)
@@ -69,8 +78,10 @@ func main() {
 	http.Handle("/avatars/",
 		http.StripPrefix("/avatars/",
 			http.FileServer(http.Dir("./avatars"))))
+
 	// チャットルーム開始
 	go r.run()
+
 	// Webサーバーを起動
 	log.Println("Webサーバーを起動します。ポート:", *addr)
 	if err := http.ListenAndServe(*addr, nil); err != nil {

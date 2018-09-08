@@ -1,92 +1,91 @@
 <!doctype html>
 <html>
-  <head lang="ja">
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-      <!-- Bootstrap CSS -->
-      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-      <!-- fontawesome -->
-      <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
-    <title>Go Chat</title>
-    <style>
-      input { display: block; }
-      ul    { list-style: none; }
-    </style>
-  </head>
-  
-  <body>
-    <!-- navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <a class="navbar-brand mb-0 h1" href="#">Go Chat <i class="far fa-comment"></i></a>
-      <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#Navber" aria-controls="Navber" aria-expanded="false"></button>
-      <div class="collapse navbar-collapse" id="Navber">
-        <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-          <a class="nav-link ml-auto" href="/logout">SingOut</a>
-        </ul>
-      </div>
-    </nav>
-    <!-- navbar -->
+	<head lang="ja">
+			<meta charset="utf-8">
+			<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+			<!-- Bootstrap CSS -->
+			<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+			<!-- fontawesome -->
+			<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+		<title>Go Chat</title>
+		<style>
+			input { display: block; }
+			ul    { list-style: none; }
+		</style>
+	</head>
+	
+	<body>
+		<!-- navbar -->
+		<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+			<a class="navbar-brand mb-0 h1" href="#">Go Chat <i class="far fa-comment"></i></a>
+			<button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#Navber" aria-controls="Navber" aria-expanded="false"></button>
+			<div class="collapse navbar-collapse" id="Navber">
+				<ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+					<a class="nav-link ml-auto" href="/logout">SingOut</a>
+				</ul>
+			</div>
+		</nav>
+		<!-- navbar -->
 
-    <!-- main body -->
-    <div class="container">
-      <!-- messages box -->
-      <div class="card pt-5 pb-5 mt-5 mb-5">
-        <div class="card-body">
-          <ul id="messages" class="card-text"></ul>
-        </div>
-      </div>
-      <!-- send message form -->
-      <form id="chatbox">
-        <div class="form-group">
-          <label>{{.UserData.name}}</label><a href="/upload" class="small pl-2">プロフィール画像を変更</a>
-          <textarea class="form-control" placeholder="message..." rows="3"></textarea>
-          <input class="btn btn-dark mt-3" type="submit" value="Send" />
-        </div>
-      </form>
-    </div>
-    <!-- main body -->
-  
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-    <script>
-      $(function(){
-        var socket = null;
-        var msgBox = $("#chatbox textarea");
-        var messages = $("#messages");
-        $("#chatbox").submit(function(){
-          if (!msgBox.val()) return false;
-          if (!socket) {
-            alert("Error: There is no socket connection.");
-            return false;
-          }
-          socket.send(JSON.stringify({"Message": msgBox.val()}));
-          msgBox.val("");
-          return false;
-        });
-        if (!window["WebSocket"]) {
-          alert("Error: Your browser does not support web sockets.")
-        } else {
-          socket = new WebSocket("ws://{{.Host}}/room");
-          socket.onclose = function() {
-            alert("Connection has been closed.");
-          }
-          socket.onmessage = function(e) {
-            var msg = eval("("+e.data+")");
-            messages.append(
-              $("<li>").attr("class", "pb-2").append(
-                $("<img>").attr("title", msg.Name).attr("class", "rounded-circle").css({
-                  width:50,
-                  verticalAlign:"middle"
-                }).attr("src", msg.AvatarURL),
-                $("<span>").attr("class", "pl-2").text(msg.Message),
-                $("<small>").text(" <" + msg.When.substr(5,11) + ">")
-              )
-            );
-          }
-        }
-      });
-    </script>
-  </body>
+		<!-- main body -->
+		<div class="container">
+			<!-- messages box -->
+			<div class="card pt-5 pb-5 mt-5 mb-5">
+				<div class="card-body">
+					<ul id="messages" class="card-text"></ul>
+				</div>
+			</div>
+			<!-- send message form -->
+			<form id="chatbox">
+				<div class="form-group">
+					<label>{{.UserData.name}}</label><a href="/upload" class="small pl-2">プロフィール画像を変更</a>
+					<textarea class="form-control" placeholder="message..." rows="3"></textarea>
+					<input class="btn btn-dark mt-3" type="submit" value="Send" />
+				</div>
+			</form>
+		</div>
+		<!-- main body -->
+		<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+		<script>
+			$(function(){
+				var socket = null;
+				var msgBox = $("#chatbox textarea");
+				var messages = $("#messages");
+				$("#chatbox").submit(function(){
+					if (!msgBox.val()) return false;
+					if (!socket) {
+						alert("Error: There is no socket connection.");
+						return false;
+					}
+					socket.send(JSON.stringify({"Message": msgBox.val()}));
+					msgBox.val("");
+					return false;
+				});
+				if (!window["WebSocket"]) {
+					alert("Error: Your browser does not support web sockets.")
+				} else {
+					socket = new WebSocket("ws://{{.Host}}/room");
+					socket.onclose = function() {
+						alert("Connection has been closed.");
+					}
+					socket.onmessage = function(e) {
+						var msg = eval("("+e.data+")");
+						messages.append(
+							$("<li>").attr("class", "pb-2").append(
+								$("<img>").attr("title", msg.Name).attr("class", "rounded-circle").css({
+									width:50,
+									verticalAlign:"middle"
+								}).attr("src", msg.AvatarURL),
+								$("<span>").attr("class", "pl-2").text(msg.Message),
+								$("<small>").text(" <" + msg.When.substr(5,11) + ">")
+							)
+						);
+					}
+				}
+			});
+		</script>
+	</body>
 </html>
