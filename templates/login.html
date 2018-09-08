@@ -11,19 +11,42 @@
     <title>ログイン</title>
   </head>
   <body>
+    <!-- navbar -->
+		<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <a class="navbar-brand mb-0 h1" href="#">Go Chat <i class="far fa-comment"></i></a>
+      <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#Navber" aria-controls="Navber" aria-expanded="false"></button>
+      <div class="collapse navbar-collapse" id="Navber">
+        <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+          <a class="nav-link ml-auto" href="/auth/login/google">SingIn</a>
+        </ul>
+      </div>
+    </nav>
+    <!-- navbar -->
+
     <div class="container">
+      <div class="jumbotron mt-4">
+        <h1 class="display-4">Go Chatへようこそ!</h1>
+        <p class="lead">Go ChatはGo言語で作られたシンプルなチャットWebアプリケーションです。</p>
+        <hr class="my-4">
+        <p>WebSocketを用いた双方向通信でチャット機能を実装しています</p>
+        <p>認証サービスAPIを活用したシンプルなサインインを実装しています</p>
+        <p>アバターの取得を３つのロジックで実装しています</p>
+        <a class="btn btn-primary btn-lg mt-4" href="https://golang.org/" role="button">Goを学ぼう</a>
+      </div>
+
       <div class="card border-dark mb-3 mt-5">
-          <div class="card-header">サインインしてください</div>
-          <div class="card-body text-dark">
-            <p class="card-title">Goチャットを行うにはサインインが必要です<br>サインインに使用するアカウントを選んでください</p>
-          </div>
-          <ul class="list-group list-group-flush">
-            <!-- <li class="list-group-item"><i class="fab fa-facebook-square"></i><a href="/auth/login/facebook">Facebook</a></li>
-            <li class="list-group-item"><i class="fab fa-github-square"></i><a href="/auth/login/github">Github</a></li> -->
-            <li class="list-group-item"><i class="fab fa-google"></i><a href="/auth/login/google"> Google</a></li>
-          </ul>
+        <div class="card-header">サインインしてください</div>
+        <div class="card-body text-dark">
+          <p class="card-title">Goチャットを行うにはサインインが必要です<br>サインインに使用するアカウントを選んでください</p>
+        </div>
+        <ul class="list-group list-group-flush">
+          <!-- <li class="list-group-item"><i class="fab fa-facebook-square"></i><a href="/auth/login/facebook">Facebook</a></li>
+          <li class="list-group-item"><i class="fab fa-github-square"></i><a href="/auth/login/github">Github</a></li> -->
+          <li class="list-group-item"><i class="fab fa-google"></i><a href="/auth/login/google"> Google</a></li>
+        </ul>
       </div>
     </div>
+
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>

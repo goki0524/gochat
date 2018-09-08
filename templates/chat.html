@@ -10,7 +10,6 @@
 		<title>Go Chat</title>
 		<style>
 			input { display: block; }
-			ul    { list-style: none; }
 		</style>
 	</head>
 	
@@ -30,10 +29,13 @@
 		<!-- main body -->
 		<div class="container">
 			<!-- messages box -->
-			<div class="card pt-5 pb-5 mt-5 mb-5">
-				<div class="card-body">
-					<ul id="messages" class="card-text"></ul>
+			<div class="card pb-5 mt-5 mb-5">
+				<div class="card-header bg-dark text-white mb-3">
+					Let's Go Chat !
 				</div>
+				<ul class="card-text">
+					<li id="messages" class="list-unstyled mb-1"></li>
+				</ul>
 			</div>
 			<!-- send message form -->
 			<form id="chatbox">
