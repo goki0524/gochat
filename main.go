@@ -49,7 +49,7 @@ func main() {
 	flag.Parse() // フラグを解析
 
 	// Gomniauthのセットアップ
-	gomniauth.SetSecurityKey("55dfbg7iu2nb4uywevihjw4tuiyub34noilk")
+	gomniauth.SetSecurityKey("security-key")
 	gomniauth.WithProviders(
 		google.New("clien-id", "private-key", "http://localhost:8080/auth/callback/google"),
 	)
